@@ -76,9 +76,11 @@ Bring an idea, contribute a commit to an existing project, open an issue, or pit
 
 All official League projects are open source. Explore our repositories, contribute code, report issues, or fork something and make it even worse (or somehow better).
 
-| Project | What it is | Stack |
-| :--- | :--- | :--- |
-| **[Neuroslop-League](https://github.com/orgs/Neuroslop-League/repositories)** | *Watch this space — new open-source experiments land directly in our org repositories.* | `AI` `Open Source` |
+<!-- PROJECTS:START -->
+| Project | What it is | Stack | Stars |
+| :--- | :--- | :--- | ---: |
+| **[Neuroslop-League](https://github.com/orgs/Neuroslop-League/repositories)** | *No standalone project repositories yet — new public org repos will appear here automatically.* | `AI` `Open Source` | — |
+<!-- PROJECTS:END -->
 
 ---
 
@@ -92,12 +94,18 @@ All official League projects are open source. Explore our repositories, contribu
 
 ---
 
-## Member Contributions
+## Member Contributions & Languages
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-light.svg">
   <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-dark.svg" alt="Neuroslop League member contributions over the last 12 months" width="100%">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/langs-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/langs-light.svg">
+  <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/langs-dark.svg" alt="Code split by language across Neuroslop League public repositories" width="100%">
 </picture>
 
 ---
@@ -117,4 +125,6 @@ We are here to vibe-code a new one, publish it on GitHub, and call it innovation
 <a href="https://github.com/Neuroslop-League/.github/blob/main/scripts/gen_org_stats.py">gen_org_stats.py</a>
 pulls per-member contribution data from the GitHub GraphQL API for every login in
 <a href="https://github.com/Neuroslop-League/.github/blob/main/members.txt">members.txt</a>
-(plus any visible org members), and a workflow updates the cards every six hours.</sub>
+(plus any visible org members),
+<a href="https://github.com/Neuroslop-League/.github/blob/main/scripts/gen_org_langs.py">gen_org_langs.py</a>
+builds the language card and syncs the Projects table, and a workflow updates everything automatically on roster edits and every six hours.</sub>

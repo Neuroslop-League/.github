@@ -27,14 +27,13 @@ THEMES = {
         hair="#242424",
         shadow="#000000", shadow_op="0.55",
         members=[
-            "#FFFFFF",  # pure white
-            "#BFBFBF",  # silver
-            "#8C8C8C",  # mid gray
-            "#5E5E5E",  # charcoal
-            "#E0E0E0",  # off-white
-            "#A3A3A3",  # ash
-            "#737373",  # slate gray
-            "#4A4A4A",  # dark gray
+            "#FFFFFF",  # 1
+            "#D4D4D4",  # 2
+            "#A8A8A8",  # 3
+            "#828282",  # 4
+            "#616161",  # 5
+            "#474747",  # 6
+            "#333333",  # 7
         ],
     ),
     "light": dict(
@@ -53,14 +52,13 @@ THEMES = {
         hair="#E0E0E0",
         shadow="#000000", shadow_op="0.14",
         members=[
-            "#0A0A0A",  # obsidian black
-            "#4A4A4A",  # dark graphite
-            "#787878",  # mid gray
-            "#A6A6A6",  # light gray
-            "#262626",  # ink
-            "#616161",  # stone
-            "#8F8F8F",  # silver
-            "#BDBDBD",  # pale gray
+            "#0A0A0A",  # 1
+            "#333333",  # 2
+            "#595959",  # 3
+            "#7D7D7D",  # 4
+            "#9E9E9E",  # 5
+            "#B8B8B8",  # 6
+            "#CCCCCC",  # 7
         ],
     ),
 }
