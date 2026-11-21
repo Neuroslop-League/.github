@@ -23,7 +23,7 @@ EYEBROW_Y = 66
 NAME1_Y, NAME2_Y = 132, 224
 MONO_Y, TAG_Y = 250, 292
 
-TAGLINE = "Everything you see is neuroslop. Or maybe not."
+TAGLINE = "An independent collective of vibe coders & slop enthusiasts."
 MONO_LINE = "NEUROSLOP LEAGUE — EST. 2026"
 
 
@@ -102,9 +102,9 @@ def banner(name: str) -> str:
       <rect x="{TX}" y="{TY}" width="{TW}" height="{TH}" rx="14" fill="{t['term_bg']}" stroke="{t['term_border']}" stroke-width="1"/>
     </g>
     <path d="M{TX} {TY + 33} h{TW}" stroke="{t['term_border']}" stroke-width="1"/>
-    <circle cx="{TX + 21}" cy="{TY + 16.5}" r="4" fill="#FF5F57" opacity="0.92"/>
-    <circle cx="{TX + 38}" cy="{TY + 16.5}" r="4" fill="#FEBC2E" opacity="0.92"/>
-    <circle cx="{TX + 55}" cy="{TY + 16.5}" r="4" fill="#28C840" opacity="0.92"/>
+    <circle cx="{TX + 21}" cy="{TY + 16.5}" r="4" fill="{t['term_dot1']}" opacity="0.88"/>
+    <circle cx="{TX + 38}" cy="{TY + 16.5}" r="4" fill="{t['term_dot2']}" opacity="0.78"/>
+    <circle cx="{TX + 55}" cy="{TY + 16.5}" r="4" fill="{t['term_dot3']}" opacity="0.78"/>
     <text x="{TX + TW - 18}" y="{TY + 20}" text-anchor="end" font-family="{MONO}" font-size="10.5" fill="{t['term_muted']}">zsh</text>
 {term_lines}
     <rect class="caret" x="{TX + 38}" y="{TY + 192}" width="7" height="13.5" fill="{t['term_amber']}" opacity="0.9"/>
