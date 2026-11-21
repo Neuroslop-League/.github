@@ -1,13 +1,13 @@
-# Лига Нейрослопа — `.github`
+# Neuroslop League — `.github`
 
-Репозиторий профиля организации **[Neuroslop-League](https://github.com/Neuroslop-League)**.
+Organization profile repository for **[Neuroslop-League](https://github.com/Neuroslop-League)**.
 
-- Главный README организации (который отображается на странице организации) находится в [`profile/README.md`](profile/README.md).
-- Карточки баннера и общей диаграммы коммитов лежат в [`assets/`](assets/) и автоматически пересобираются каждые 6 часов через [`.github/workflows/stats.yml`](.github/workflows/stats.yml).
+- The organization's public profile README (shown on `github.com/Neuroslop-League`) lives in [`profile/README.md`](profile/README.md).
+- The banner and per-member contribution cards live in [`assets/`](assets/) and are rebuilt automatically every 6 hours by [`.github/workflows/stats.yml`](.github/workflows/stats.yml).
 
-## Как добавить участников в диаграмму коммитов
+## Adding members to the contribution chart
 
-GitHub API не всегда отдаёт приватный список участников организации стандартному `GITHUB_TOKEN`, поэтому список участников ведётся явно в файле [`members.txt`](members.txt) — по одному GitHub-логину в строке:
+Because GitHub's standard `GITHUB_TOKEN` cannot always enumerate private organization memberships, the roster is maintained explicitly in [`members.txt`](members.txt) — one GitHub username per line:
 
 ```text
 RUdolf1517
@@ -15,17 +15,17 @@ username2
 username3
 ```
 
-Публичных участников организации скрипт подхватывает дополнительно сам. После правки [`members.txt`](members.txt) можно либо подождать следующего запуска workflow, либо запустить пересборку вручную во вкладке **Actions → league stats cards → Run workflow**, либо локально:
+Any public org members returned by the API are included automatically as well. After updating [`members.txt`](members.txt), wait for the next scheduled run, trigger **Actions → league stats cards → Run workflow**, or regenerate locally:
 
 ```bash
 python3 scripts/gen_banner.py
 GITHUB_TOKEN="$(gh auth token)" python3 scripts/gen_org_stats.py
 ```
 
-## Превью диаграммы
+## Contribution chart preview
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/commits-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/commits-light.svg">
-  <img src="assets/commits-dark.svg" alt="Диаграмма коммитов всех участников Лиги Нейрослопа" width="100%">
+  <img src="assets/commits-dark.svg" alt="Neuroslop League member contributions over the last 12 months" width="100%">
 </picture>

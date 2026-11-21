@@ -1,13 +1,12 @@
-# Участники Лиги Нейрослопа — по одному GitHub-логину в строке.
-# Пустые строки и строки, начинающиеся с #, игнорируются.
+# Neuroslop League members — one GitHub username per line.
+# Blank lines and lines starting with # are ignored.
 #
-# Диаграмма коммитов (assets/commits-dark.svg / commits-light.svg) строится по
-# этому списку плюс по публичным участникам организации, если API их отдаёт,
-# поэтому достаточно вписать сюда всех, кто должен попасть на карточку.
-# После изменения списка запусти:
+# The contribution diagram (assets/commits-dark.svg / commits-light.svg) is
+# generated from this roster plus any public org members returned by the API.
+# After editing this file, run:
 #
 #     GITHUB_TOKEN=... python3 scripts/gen_org_stats.py
 #
-# или дождись планового запуска GitHub Actions (каждые 6 часов).
+# or wait for the scheduled GitHub Actions run (every 6 hours).
 
 RUdolf1517
