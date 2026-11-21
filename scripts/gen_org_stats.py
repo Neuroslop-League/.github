@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
-"""Render the org-wide commit-activity card for the Neuroslop League profile README.
+"""Render the per-member contribution card for the Neuroslop League profile README.
 
-Same card as the maintainer's personal one, but aggregated over every league
-member: pulls each member's last 12 months of contribution data from the
-GitHub GraphQL API, sums the numbers across the roster and writes two
-theme-matched SVG files:
+Pulls the last 12 months of contribution data from the GitHub GraphQL API for
+every member in the roster (`members.txt` + any org members visible to the
+token) and renders two theme-matched SVG cards:
 
     assets/commits-dark.svg
     assets/commits-light.svg
 
-The roster is `members.txt` at the repo root (one GitHub login per line).
-Public members of the org, if the token is allowed to see them, are added
-automatically; anything the API refuses is simply skipped. If the roster ends
-up empty the script exits with a clear message.
+Each member gets a color-coded row (commits, PRs, share, horizontal bar) on
+the left and a matching stacked segment in the 12-month bar chart on the right.
 
-Standard library only, so the workflow needs no pip install:
+Standard library only:
 
     GITHUB_TOKEN=... python3 scripts/gen_org_stats.py
 """
@@ -38,8 +35,10 @@ MEMBERS_FILE = ROOT / "members.txt"
 
 from theme import MONO, SANS, THEMES  # noqa: E402
 
-W, H = 1000, 250
+W = 1000
 MONTHS_BACK = 12
+ROW_Y0 = 74
+ROW_H = 44
 
 
 # ---------------------------------------------------------------- data fetching
@@ -94,7 +93,7 @@ def parse_members_file() -> list[str]:
 
 
 def discover_members(token: str) -> list[str]:
-    """Roster = members.txt ∪ whatever the API lets us see of the org."""
+    """Roster = members.txt + whatever public/org members the API returns."""
     seen = {login.lower(): login for login in parse_members_file()}
 
     data = gql(
@@ -127,12 +126,10 @@ query($login:String!, $from:DateTime!, $to:DateTime!) {
       totalIssueContributions
       totalPullRequestReviewContributions
       contributionCalendar {
-        totalContributions
         weeks { contributionDays { date contributionCount } }
       }
       commitContributionsByRepository(maxRepositories:25) {
         repository { nameWithOwner }
-        contributions(first:1) { totalCount }
       }
     }
   }
@@ -155,7 +152,6 @@ def month_bounds(year: int, month: int) -> tuple[dt.datetime, dt.datetime]:
 
 
 def first_month_of_window(today: dt.date, months: int = MONTHS_BACK) -> tuple[int, int]:
-    """First month of the trailing window, so totals and bars cover the same span."""
     index = today.year * 12 + (today.month - 1) - (months - 1)
     return index // 12, index % 12 + 1
 
@@ -168,18 +164,18 @@ def collect_member(token: str, login: str, start: dt.datetime, end: dt.datetime)
         return None
     data = year["user"]["contributionsCollection"]
 
-    days = [
-        (d["date"], d["contributionCount"])
+    active_days = sum(
+        1
         for week in data["contributionCalendar"]["weeks"]
         for d in week["contributionDays"]
-    ]
-    days.sort()
+        if d["contributionCount"] > 0
+    )
 
-    months = []
-    year_, month = start.year, start.month
+    months: list[tuple[int, int, int]] = []
+    y_, m_ = start.year, start.month
     today = end.date()
-    while (year_, month) <= (today.year, today.month):
-        m_start, m_end = month_bounds(year_, month)
+    while (y_, m_) <= (today.year, today.month):
+        m_start, m_end = month_bounds(y_, m_)
         month_data = gql(MONTH_QUERY, {
             "login": login,
             "from": fmt(m_start),
@@ -188,8 +184,8 @@ def collect_member(token: str, login: str, start: dt.datetime, end: dt.datetime)
         commits = 0
         if month_data and month_data.get("user"):
             commits = month_data["user"]["contributionsCollection"]["totalCommitContributions"]
-        months.append((year_, month, commits))
-        year_, month = (year_ + 1, 1) if month == 12 else (year_, month + 1)
+        months.append((y_, m_, commits))
+        y_, m_ = (y_ + 1, 1) if m_ == 12 else (y_, m_ + 1)
 
     repos = [r["repository"]["nameWithOwner"] for r in data["commitContributionsByRepository"]]
 
@@ -199,16 +195,16 @@ def collect_member(token: str, login: str, start: dt.datetime, end: dt.datetime)
         prs=data["totalPullRequestContributions"],
         issues=data["totalIssueContributions"],
         reviews=data["totalPullRequestReviewContributions"],
-        days=days,
+        active_days=active_days,
         months=months,
-        repos=repos,
+        repos=len(repos),
     )
 
 
 def collect(token: str, today: dt.date) -> dict:
     logins = discover_members(token)
     if not logins:
-        sys.exit(f"No members found. Put GitHub logins into {MEMBERS_FILE} or grant the token org read access.")
+        sys.exit(f"No members found. Add GitHub logins to {MEMBERS_FILE} or grant org read access.")
 
     start, _ = month_bounds(*first_month_of_window(today))
     end = dt.datetime(today.year, today.month, today.day, 23, 59, 59, tzinfo=dt.timezone.utc)
@@ -217,131 +213,158 @@ def collect(token: str, today: dt.date) -> dict:
     if not members:
         sys.exit("None of the roster members returned contribution data.")
 
-    # Sum everything across the roster.
-    commits = sum(m["commits"] for m in members)
-    prs = sum(m["prs"] for m in members)
-    issues = sum(m["issues"] for m in members)
-    reviews = sum(m["reviews"] for m in members)
-    repos = sorted({repo for m in members for repo in m["repos"]})
+    # Sort by commits descending, then PRs descending, then login ascending.
+    members.sort(key=lambda m: (-m["commits"], -m["prs"], m["login"].lower()))
 
-    day_sum: dict[str, int] = {}
-    for m in members:
-        for date, count in m["days"]:
-            day_sum[date] = day_sum.get(date, 0) + count
-    days = sorted(day_sum.items())
-
-    active_days = sum(1 for _, count in days if count > 0)
-    busiest_date, busiest_count = max(days, key=lambda x: x[1], default=(None, 0))
-
-    longest = current = 0
-    for _, count in days:
-        current = current + 1 if count > 0 else 0
-        longest = max(longest, current)
-    trailing = 0
-    for _, count in reversed(days):
-        if count == 0:
-            break
-        trailing += 1
-
-    months_map: dict[tuple[int, int], int] = {}
-    for m in members:
-        for year, month, count in m["months"]:
-            months_map[(year, month)] = months_map.get((year, month), 0) + count
-    months = sorted((y, mo, c) for (y, mo), c in months_map.items())
-
-    most_active = max(members, key=lambda m: m["commits"], default=None)
+    month_keys = [(y, mo) for y, mo, _ in members[0]["months"]]
 
     return dict(
         org=ORG,
-        member_count=len(members),
-        commits=commits,
-        prs=prs,
-        issues=issues,
-        reviews=reviews,
-        repos=len(repos),
-        active_days=active_days,
-        longest_streak=longest,
-        current_streak=trailing,
-        busiest_date=busiest_date,
-        busiest_count=busiest_count,
-        months=months,
-        most_active=(most_active["login"], most_active["commits"]) if most_active else None,
+        members=members,
+        month_keys=month_keys,
+        total_commits=sum(m["commits"] for m in members),
+        total_prs=sum(m["prs"] for m in members),
         updated=today.isoformat(),
     )
 
 
 # --------------------------------------------------------------------- rendering
 
+def esc(text: str) -> str:
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def nf(n: int) -> str:
     return f"{n:,}".replace(",", " ")
 
 
-def human_date(iso: str | None) -> str:
-    if not iso:
-        return "—"
-    d = dt.date.fromisoformat(iso)
-    return f"{d.day} {d.strftime('%b')}"
-
-
-def stat_block(x: float, value: int, label: str, t: dict) -> str:
-    return f"""    <text x="{x}" y="132" font-family="{SANS}" font-size="42" font-weight="700" letter-spacing="-1" fill="{t['text']}">{nf(value)}</text>
-    <text x="{x + 1}" y="152" font-family="{MONO}" font-size="10.5" letter-spacing="1.7" fill="{t['label']}">{label}</text>"""
+def trunc_login(login: str, limit: int = 18) -> str:
+    return login if len(login) <= limit else login[: limit - 1] + "…"
 
 
 def render(d: dict, name: str) -> str:
     t = THEMES[name]
+    palette = t["members"]
+    members = d["members"]
+    month_keys = d["month_keys"]
 
-    chart_x, chart_w, chart_base, chart_h = 560, 384, 186, 100
-    bars = d["months"]
-    gap = 9
-    bar_w = (chart_w - gap * (len(bars) - 1)) / len(bars)
-    peak = max((c for *_, c in bars), default=1) or 1
+    h = max(260, ROW_Y0 + len(members) * ROW_H + 48)
+    left_x, right_edge = 56, 512
+    bar_x = 74
+    track_w = right_edge - bar_x
 
-    bar_svg = []
-    for i, (year, month, commits) in enumerate(bars):
-        x = chart_x + i * (bar_w + gap)
-        is_current = i == len(bars) - 1
-        h = max(2.5, chart_h * commits / peak) if commits else 2.5
-        y = chart_base - h
-        fill = t["stub"] if commits == 0 else (t["bar_accent"] if is_current else t["bar"])
-        rx = min(3, h / 2)
-        bar_svg.append(
-            f'      <rect x="{x:.1f}" y="{y:.1f}" width="{bar_w:.1f}" height="{h:.1f}" rx="{rx:.1f}" fill="{fill}">'
-            f'<title>{commits} commits · {dt.date(year, month, 1).strftime("%B %Y")}</title></rect>'
-        )
-        if commits:
-            bar_svg.append(
-                f'      <text x="{x + bar_w / 2:.1f}" y="{y - 8:.1f}" text-anchor="middle" '
-                f'font-family="{MONO}" font-size="9.5" fill="{t["muted"]}">{commits}</text>'
+    max_commits = max((m["commits"] for m in members), default=1) or 1
+    total_commits = d["total_commits"] or 1
+
+    member_svg = []
+    for i, m in enumerate(members):
+        color = palette[i % len(palette)]
+        y0 = ROW_Y0 + i * ROW_H
+        share = round(100 * m["commits"] / total_commits) if d["total_commits"] else 0
+        fill_w = max(6.0, track_w * m["commits"] / max_commits) if m["commits"] else 0.0
+        display_name = esc(trunc_login(m["login"]))
+
+        member_svg.append(
+            f'    <g>\n'
+            f'      <title>@{esc(m["login"])}: {nf(m["commits"])} commits, {nf(m["prs"])} PRs, '
+            f'{m["repos"]} repos, {m["active_days"]} active days ({share}%)</title>\n'
+            f'      <circle cx="{left_x + 6}" cy="{y0 + 11}" r="4.5" fill="{color}"/>\n'
+            f'      <text x="{bar_x}" y="{y0 + 15}" font-family="{SANS}" font-size="13.5" font-weight="600" fill="{t["text"]}">@{display_name}</text>\n'
+            f'      <text x="{right_edge}" y="{y0 + 15}" text-anchor="end">'
+            f'<tspan font-family="{SANS}" font-size="13.5" font-weight="700" fill="{t["text"]}">{nf(m["commits"])}</tspan>'
+            f'<tspan font-family="{MONO}" font-size="10" fill="{t["muted"]}"> commits &#183; {nf(m["prs"])} PRs &#183; {share}%</tspan>'
+            f'</text>\n'
+            f'      <rect x="{bar_x}" y="{y0 + 24}" width="{track_w}" height="7" rx="3.5" fill="{t["stub"]}"/>\n'
+            + (
+                f'      <rect x="{bar_x}" y="{y0 + 24}" width="{fill_w:.1f}" height="7" rx="3.5" fill="{color}"/>\n'
+                if fill_w > 0 else ""
             )
+            + f'    </g>'
+        )
+
+    # Stacked 12-month bar chart on the right.
+    chart_x, chart_w = 556, 388
+    chart_top, chart_base = 84, h - 56
+    chart_h = chart_base - chart_top
+    gap = 9
+    bar_w = (chart_w - gap * (len(month_keys) - 1)) / len(month_keys)
+
+    month_totals = [
+        sum(m["months"][mi][2] for m in members)
+        for mi in range(len(month_keys))
+    ]
+    peak = max(month_totals, default=1) or 1
+
+    clip_defs = []
+    bar_svg = []
+    for mi, (year, month) in enumerate(month_keys):
+        x = chart_x + mi * (bar_w + gap)
+        total = month_totals[mi]
+        total_h = max(2.5, chart_h * total / peak) if total else 2.5
+        bar_y = chart_base - total_h
+        rx = min(3.0, total_h / 2)
+
+        if total == 0:
+            bar_svg.append(
+                f'      <rect x="{x:.1f}" y="{bar_y:.1f}" width="{bar_w:.1f}" height="{total_h:.1f}" '
+                f'rx="{rx:.1f}" fill="{t["stub"]}">'
+                f'<title>0 commits · {dt.date(year, month, 1).strftime("%B %Y")}</title></rect>'
+            )
+        else:
+            clip_id = f"mbar-{mi}"
+            clip_defs.append(
+                f'    <clipPath id="{clip_id}">'
+                f'<rect x="{x:.1f}" y="{bar_y:.1f}" width="{bar_w:.1f}" height="{total_h:.1f}" rx="{rx:.1f}"/>'
+                f'</clipPath>'
+            )
+            segs = []
+            cursor = float(chart_base)
+            breakdown = []
+            for idx, m in enumerate(members):
+                cnt = m["months"][mi][2]
+                if cnt <= 0:
+                    continue
+                seg_h = total_h * cnt / total
+                seg_y = cursor - seg_h
+                color = palette[idx % len(palette)]
+                segs.append(
+                    f'        <rect x="{x:.1f}" y="{seg_y:.2f}" width="{bar_w:.1f}" height="{seg_h + 0.4:.2f}" fill="{color}"/>'
+                )
+                breakdown.append(f"@{m['login']}: {cnt}")
+                cursor = seg_y
+
+            tip = f'{dt.date(year, month, 1).strftime("%B %Y")} ({nf(total)} commits): ' + ", ".join(breakdown)
+            bar_svg.append(
+                f'      <g clip-path="url(#{clip_id})">\n'
+                f'        <title>{esc(tip)}</title>\n'
+                + "\n".join(segs)
+                + '\n      </g>'
+            )
+            bar_svg.append(
+                f'      <text x="{x + bar_w / 2:.1f}" y="{bar_y - 7:.1f}" text-anchor="middle" '
+                f'font-family="{MONO}" font-size="9.5" fill="{t["muted"]}">{total}</text>'
+            )
+
         bar_svg.append(
             f'      <text x="{x + bar_w / 2:.1f}" y="{chart_base + 17}" text-anchor="middle" '
             f'font-family="{MONO}" font-size="9.5" fill="{t["label"]}">'
             f'{dt.date(year, month, 1).strftime("%b")}</text>'
         )
 
-    facts = "  ·  ".join([
-        f'{d["active_days"]} active days',
-        f'longest streak {d["longest_streak"]} d',
-        f'busiest day {d["busiest_count"]} ({human_date(d["busiest_date"])})',
-    ])
-
-    top_line = ""
-    if d["most_active"]:
-        login, count = d["most_active"]
-        top_line = (
-            f'    <text x="56" y="212" font-family="{MONO}" font-size="11" fill="{t["muted"]}">'
-            f'most active: {login} — {nf(count)} commits  ·  {d["repos"]} repositories</text>'
-        )
-
-    bars_svg = "\n".join(bar_svg)
-
-    first = dt.date(bars[0][0], bars[0][1], 1)
-    last = dt.date(bars[-1][0], bars[-1][1], 1)
+    first = dt.date(month_keys[0][0], month_keys[0][1], 1)
+    last = dt.date(month_keys[-1][0], month_keys[-1][1], 1)
     span = f'{first.strftime("%b %Y")} → {last.strftime("%b %Y")}'
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-labelledby="stitle">
-  <title id="stitle">Commit activity for all Neuroslop League members: {d['commits']} commits and {d['prs']} pull requests over the last 12 months</title>
+    member_word = "member" if len(members) == 1 else "members"
+    footer_left = (
+        f'{len(members)} {member_word} &#183; '
+        f'{nf(d["total_commits"])} commits &#183; '
+        f'{nf(d["total_prs"])} PRs &#183; '
+        f'updated {d["updated"]}'
+    )
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {h}" width="{W}" height="{h}" role="img" aria-labelledby="stitle">
+  <title id="stitle">Neuroslop League member contributions over the last 12 months ({len(members)} {member_word}, {nf(d['total_commits'])} commits)</title>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="{t['bg0']}"/><stop offset="1" stop-color="{t['bg1']}"/>
@@ -357,32 +380,29 @@ def render(d: dict, name: str) -> str:
     <pattern id="dots" width="21" height="21" patternUnits="userSpaceOnUse">
       <circle cx="1.5" cy="1.5" r="1.05" fill="{t['dot']}" fill-opacity="{t['dot_op']}"/>
     </pattern>
-    <clipPath id="frame"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="18"/></clipPath>
+    <clipPath id="frame"><rect x="1" y="1" width="{W - 2}" height="{h - 2}" rx="18"/></clipPath>
+{chr(10).join(clip_defs)}
   </defs>
 
   <g clip-path="url(#frame)">
-    <rect width="{W}" height="{H}" fill="url(#bg)"/>
-    <rect width="{W}" height="{H}" fill="url(#dots)"/>
+    <rect width="{W}" height="{h}" fill="url(#bg)"/>
+    <rect width="{W}" height="{h}" fill="url(#dots)"/>
     <ellipse cx="40" cy="20" rx="300" ry="190" fill="url(#glowA)"/>
-    <ellipse cx="960" cy="240" rx="300" ry="180" fill="url(#glowB)"/>
+    <ellipse cx="960" cy="{h - 10}" rx="300" ry="180" fill="url(#glowB)"/>
 
-    <text x="56" y="46" font-family="{MONO}" font-size="11" letter-spacing="3.2" fill="{t['amber']}">COMMITS &#183; ALL MEMBERS &#183; LAST 12 MONTHS</text>
-{stat_block(56, d['commits'], 'COMMITS', t)}
-{stat_block(224, d['prs'], 'PULL REQUESTS', t)}
-{stat_block(392, d['member_count'], 'MEMBERS', t)}
-    <path d="M212 74 v82" stroke="{t['hair']}" stroke-width="1"/>
-    <path d="M380 74 v82" stroke="{t['hair']}" stroke-width="1"/>
-    <text x="56" y="190" font-family="{MONO}" font-size="11" fill="{t['muted']}">{facts}</text>
-{top_line}
-    <text x="56" y="236" font-family="{MONO}" font-size="9.5" fill="{t['label']}">updated {d['updated']}</text>
+    <text x="{left_x}" y="46" font-family="{MONO}" font-size="11" letter-spacing="3.0" fill="{t['amber']}">CONTRIBUTIONS &#183; BY MEMBER &#183; LAST 12 MONTHS</text>
+{chr(10).join(member_svg)}
+    <text x="{left_x}" y="{h - 20}" font-family="{MONO}" font-size="9.5" fill="{t['label']}">{footer_left}</text>
 
-    <text x="{chart_x}" y="46" font-family="{MONO}" font-size="10.5" letter-spacing="2.6" fill="{t['label']}">COMMIT ACTIVITY</text>
+    <path d="M534 34 v{h - 56}" stroke="{t['hair']}" stroke-width="1"/>
+
+    <text x="{chart_x}" y="46" font-family="{MONO}" font-size="10.5" letter-spacing="2.4" fill="{t['label']}">MONTHLY BREAKDOWN</text>
     <text x="{chart_x + chart_w}" y="46" text-anchor="end" font-family="{MONO}" font-size="9.5" fill="{t['label']}">{span}</text>
-{bars_svg}
+{chr(10).join(bar_svg)}
     <path d="M{chart_x} {chart_base + 0.5} h{chart_w}" stroke="{t['hair']}" stroke-width="1"/>
-    <text x="{chart_x + chart_w}" y="232" text-anchor="end" font-family="{MONO}" font-size="9.5" fill="{t['label']}">commits per month</text>
+    <text x="{chart_x + chart_w}" y="{h - 20}" text-anchor="end" font-family="{MONO}" font-size="9.5" fill="{t['label']}">stacked commits per month</text>
   </g>
-  <rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="18" fill="none" stroke="{t['border']}" stroke-width="1"/>
+  <rect x="1" y="1" width="{W - 2}" height="{h - 2}" rx="18" fill="none" stroke="{t['border']}" stroke-width="1"/>
 </svg>
 """
 
@@ -401,8 +421,7 @@ def main() -> None:
         path.write_text(render(data, theme), encoding="utf-8")
         print(f"wrote {path.relative_to(ROOT)} ({path.stat().st_size} B)")
 
-    print(f"members={data['member_count']} commits={data['commits']} prs={data['prs']} "
-          f"repos={data['repos']} active_days={data['active_days']} longest={data['longest_streak']}")
+    print(f"members={len(data['members'])} commits={data['total_commits']} prs={data['total_prs']}")
 
 
 if __name__ == "__main__":

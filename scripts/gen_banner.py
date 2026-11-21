@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the Neuroslop League banner (light + dark) as static SVG.
 
-Same geometry and visual language as the maintainer's personal profile banner:
+Same geometry and visual language as RUdolf1517's personal profile banner:
 1000px wide, two theme-matched files under assets/.
 
     python3 scripts/gen_banner.py
@@ -23,7 +23,7 @@ EYEBROW_Y = 66
 NAME1_Y, NAME2_Y = 132, 224
 MONO_Y, TAG_Y = 250, 292
 
-TAGLINE = "Всё, что вы видите — нейрослоп. Или нет."
+TAGLINE = "Everything you see is neuroslop. Or maybe not."
 MONO_LINE = "NEUROSLOP LEAGUE — EST. 2026"
 
 
@@ -35,10 +35,10 @@ def banner(name: str) -> str:
     t = THEMES[name]
 
     lines = [
-        (f'<tspan fill="{t["term_amber"]}">$</tspan> <tspan fill="{t["term_text"]}">neuroslop gen "кот в космосе"</tspan>', 54),
-        (f'<tspan fill="{t["term_green"]}">&#10003; кот_космос_финал_v27.png</tspan>', 75),
-        (f'<tspan fill="{t["term_amber"]}">$</tspan> <tspan fill="{t["term_text"]}">grep качество /dev/null</tspan>', 104),
-        (f'<tspan fill="{t["term_muted"]}">grep: качество: not found</tspan>', 125),
+        (f'<tspan fill="{t["term_amber"]}">$</tspan> <tspan fill="{t["term_text"]}">neuroslop gen "cat in space"</tspan>', 54),
+        (f'<tspan fill="{t["term_green"]}">&#10003; cat_space_final_v27.png</tspan>', 75),
+        (f'<tspan fill="{t["term_amber"]}">$</tspan> <tspan fill="{t["term_text"]}">grep quality /dev/null</tspan>', 104),
+        (f'<tspan fill="{t["term_muted"]}">grep: quality: not found</tspan>', 125),
         (f'<tspan fill="{t["term_amber"]}">$</tspan> <tspan fill="{t["term_text"]}">ls</tspan>', 154),
         (f'<tspan fill="{t["term_green"]}">ideas/</tspan>  <tspan fill="{t["term_green"]}">slop/</tspan>  <tspan fill="{t["term_green"]}">final/</tspan>', 175),
         (f'<tspan fill="{t["term_amber"]}">$</tspan>', 203),
@@ -50,8 +50,8 @@ def banner(name: str) -> str:
     )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-labelledby="t d">
-  <title id="t">Лига Нейрослопа — Neuroslop League</title>
-  <desc id="d">Banner of the Neuroslop League GitHub organization: the league name and a terminal running the mythical neuroslop CLI.</desc>
+  <title id="t">Neuroslop League</title>
+  <desc id="d">Banner of the Neuroslop League GitHub organization: organization name and a terminal running the mythical neuroslop CLI.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="{t['bg0']}"/><stop offset="1" stop-color="{t['bg1']}"/>
@@ -93,8 +93,8 @@ def banner(name: str) -> str:
     <circle class="pulse" cx="{PX + 3}" cy="{EYEBROW_Y - 4}" r="4.2" fill="{t['amber']}"/>
     <text x="{PX + 17}" y="{EYEBROW_Y}" font-family="{MONO}" font-size="11" letter-spacing="3.4" fill="{t['eyebrow']}">GITHUB ORGANIZATION</text>
 
-    <text x="{PX - 2}" y="{NAME1_Y}" font-family="{SANS}" font-size="62" font-weight="700" letter-spacing="-1.2" fill="url(#name)">ЛИГА</text>
-    <text x="{PX - 2}" y="{NAME2_Y}" font-family="{SANS}" font-size="62" font-weight="700" letter-spacing="-1.2" fill="url(#name)">НЕЙРОСЛОПА</text>
+    <text x="{PX - 2}" y="{NAME1_Y}" font-family="{SANS}" font-size="62" font-weight="700" letter-spacing="-1.2" fill="url(#name)">NEUROSLOP</text>
+    <text x="{PX - 2}" y="{NAME2_Y}" font-family="{SANS}" font-size="62" font-weight="700" letter-spacing="-1.2" fill="url(#name)">LEAGUE</text>
     <text x="{PX}" y="{MONO_Y}" font-family="{MONO}" font-size="10.5" letter-spacing="2.2" fill="{t['eyebrow']}">{esc(MONO_LINE)}</text>
     <text x="{PX}" y="{TAG_Y}" font-family="{SANS}" font-size="14.5" fill="{t['tagline']}">{esc(TAGLINE)}</text>
 

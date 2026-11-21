@@ -3,67 +3,67 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/banner-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/banner-light.svg">
-  <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/banner-dark.svg" alt="Лига Нейрослопа — Neuroslop League" width="100%">
+  <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/banner-dark.svg" alt="Neuroslop League" width="100%">
 </picture>
 
 <a href="https://github.com/Neuroslop-League"><img src="https://img.shields.io/badge/Neuroslop--League-0B1220?style=flat-square&logo=github&logoColor=white" alt="GitHub Organization"></a>
-<a href="https://github.com/orgs/Neuroslop-League/repositories"><img src="https://img.shields.io/badge/%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B-0B1220?style=flat-square&logo=git&logoColor=white" alt="Repositories"></a>
-<a href="https://github.com/orgs/Neuroslop-League/people"><img src="https://img.shields.io/badge/%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8-0B1220?style=flat-square&logo=githubsponsors&logoColor=white" alt="Members"></a>
+<a href="https://github.com/orgs/Neuroslop-League/repositories"><img src="https://img.shields.io/badge/projects-0B1220?style=flat-square&logo=git&logoColor=white" alt="Repositories"></a>
+<a href="https://github.com/orgs/Neuroslop-League/people"><img src="https://img.shields.io/badge/members-0B1220?style=flat-square&logo=githubsponsors&logoColor=white" alt="Members"></a>
 
 </div>
 
 <!-- =========================================================================
-     МЕСТО ДЛЯ ТЕКСТА — ВВОДНОЕ ОПИСАНИЕ / МАНИФЕСТ
-     Замени блок ниже на своё описание Лиги Нейрослопа.
+     SPACE FOR TEXT — INTRO / MANIFESTO
+     Replace the placeholder below with your description of Neuroslop League.
      ========================================================================= -->
 
-> *Здесь будет описание **Лиги Нейрослопа** — кто мы, зачем собрались и почему половина всего вокруг написана промптами.*
+> *Placeholder for the **Neuroslop League** intro — who we are, why we teamed up, and why half of everything around here was prompted into existence.*
 
 ---
 
-## О лиге
+## About
 
-<!-- Сюда можно добавить основной текст: историю, принципы, правила приёма, ссылки на чаты/ресурсы. -->
+<!-- Add the main text here: background, principles, how to join, links to chats or resources. -->
 
-*Место для текста о том, чем занимается организация и какие задачи решает.*
+*Space reserved for text about what the organization builds and stands for.*
 
 ---
 
-## Проекты
+## Projects
 
-<!-- Заполняй таблицу по мере появления репозиториев в организации. -->
+<!-- Fill in the table as repositories are added to the organization. -->
 
-| Проект | Что это | Стек |
+| Project | What it is | Stack |
 | :--- | :--- | :--- |
-| **[project-1](https://github.com/Neuroslop-League)** | *Короткое описание первого проекта* | `Python` `AI` |
-| **[project-2](https://github.com/Neuroslop-League)** | *Короткое описание второго проекта* | `Rust` `TypeScript` |
-| **[project-3](https://github.com/Neuroslop-League)** | *Короткое описание третьего проекта* | `...` |
+| **[project-1](https://github.com/Neuroslop-League)** | *Short description of the first project* | `Python` `AI` |
+| **[project-2](https://github.com/Neuroslop-League)** | *Short description of the second project* | `Rust` `TypeScript` |
+| **[project-3](https://github.com/Neuroslop-League)** | *Short description of the third project* | `...` |
 
 ---
 
-## Участники
+## Members
 
-<!-- Список участников. Чтобы пользователь учитывался на диаграмме коммитов ниже, добавь его логин в файл members.txt в корне репозитория .github. -->
+<!-- Member roster. To include a member in the contribution chart below, add their GitHub username to members.txt in the .github repo root. -->
 
-| Участник | Роль / заметка | Профиль |
+| Member | Role / note | Profile |
 | :--- | :--- | :--- |
-| **@RUdolf1517** | *описание / роль* | [github.com/RUdolf1517](https://github.com/RUdolf1517) |
-| **@member-2** | *место для нового участника* | — |
-| **@member-3** | *место для нового участника* | — |
+| **@RUdolf1517** | *role / description* | [github.com/RUdolf1517](https://github.com/RUdolf1517) |
+| **@member-2** | *placeholder for a member* | — |
+| **@member-3** | *placeholder for a member* | — |
 
 ---
 
-## Активность всех участников
+## Member Contributions
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-light.svg">
-  <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-dark.svg" alt="Диаграмма коммитов всех участников Лиги Нейрослопа за последние 12 месяцев" width="100%">
+  <img src="https://raw.githubusercontent.com/Neuroslop-League/.github/main/assets/commits-dark.svg" alt="Neuroslop League member contributions over the last 12 months" width="100%">
 </picture>
 
-<sub>Карточки генерируются автоматически внутри репозитория без сторонних сервисов:
-<a href="https://github.com/Neuroslop-League/.github/blob/main/scripts/gen_banner.py">gen_banner.py</a> рисует баннер,
+<sub>Everything on this page is generated in-repo with zero third-party services:
+<a href="https://github.com/Neuroslop-League/.github/blob/main/scripts/gen_banner.py">gen_banner.py</a> renders the banner,
 <a href="https://github.com/Neuroslop-League/.github/blob/main/scripts/gen_org_stats.py">gen_org_stats.py</a>
-собирает статистику из GitHub GraphQL API по всем логинам из
+pulls per-member contribution data from the GitHub GraphQL API for every login in
 <a href="https://github.com/Neuroslop-League/.github/blob/main/members.txt">members.txt</a>
-(и публичным участникам организации), а GitHub Actions обновляет SVG каждые 6 часов.</sub>
+(plus any visible org members), and a workflow updates the cards every six hours.</sub>
