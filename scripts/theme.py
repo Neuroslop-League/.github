@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Shared palette and font stacks for the org cards.
+"""Shared monochrome (black & white) palette and font stacks for the org cards.
 
 All generators (banner, member-contributions card) draw with the same colours,
-so the cards look like one set — and like one family with RUdolf1517's profile.
-Keys are a union of what each card needs; a card simply ignores the keys it
-does not use.
+so the cards look like one unified black-and-white set.
 """
 
 from __future__ import annotations
@@ -14,53 +12,55 @@ MONO = "'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, 
 
 THEMES = {
     "dark": dict(
-        bg0="#0A0E15", bg1="#0C1220", border="#1D2837",
-        dot="#1A2433", dot_op="0.55",
-        amber="#F0A87B", amber_op="0.20", blue="#4F8DF7", blue_op="0.18",
-        text="#FFFFFF", text_soft="#C3D2E4", muted="#7C8CA1", label="#5C6B7F",
-        name_from="#FFFFFF", name_to="#C3D2E4",
-        eyebrow="#F0A87B", tagline="#98A8BC",
-        pill_bg="#101826", pill_border="#223043", pill_text="#C9D5E3",
-        term_bg="#0C131D", term_border="#223043",
-        term_text="#D7E2EF", term_muted="#7C8CA1",
-        term_green="#6EE7B7", term_amber="#F0A87B",
-        bar="#33465F", bar_accent="#F0A87B", stub="#1B2534",
-        hair="#1D2837",
-        shadow="#000000", shadow_op="0.45",
+        bg0="#050505", bg1="#0E0E0E", border="#262626",
+        dot="#2B2B2B", dot_op="0.55",
+        amber="#FFFFFF", amber_op="0.09", blue="#D4D4D4", blue_op="0.06",
+        text="#FFFFFF", text_soft="#D4D4D4", muted="#8E8E8E", label="#666666",
+        name_from="#FFFFFF", name_to="#A6A6A6",
+        eyebrow="#E5E5E5", tagline="#A3A3A3",
+        pill_bg="#121212", pill_border="#2A2A2A", pill_text="#D4D4D4",
+        term_bg="#080808", term_border="#2A2A2A",
+        term_text="#F5F5F5", term_muted="#737373",
+        term_green="#D4D4D4", term_amber="#FFFFFF",
+        term_dot1="#FFFFFF", term_dot2="#999999", term_dot3="#525252",
+        bar="#404040", bar_accent="#FFFFFF", stub="#1A1A1A",
+        hair="#242424",
+        shadow="#000000", shadow_op="0.55",
         members=[
-            "#F0A87B",  # amber
-            "#4F8DF7",  # blue
-            "#6EE7B7",  # mint
-            "#A78BFA",  # violet
-            "#F472B6",  # rose
-            "#38BDF8",  # sky
-            "#FBBF24",  # gold
-            "#FB7185",  # coral
+            "#FFFFFF",  # pure white
+            "#BFBFBF",  # silver
+            "#8C8C8C",  # mid gray
+            "#5E5E5E",  # charcoal
+            "#E0E0E0",  # off-white
+            "#A3A3A3",  # ash
+            "#737373",  # slate gray
+            "#4A4A4A",  # dark gray
         ],
     ),
     "light": dict(
-        bg0="#FFFFFF", bg1="#F5F8FC", border="#E1E8F1",
-        dot="#DCE4EF", dot_op="0.8",
-        amber="#F59E6B", amber_op="0.22", blue="#4F8DF7", blue_op="0.16",
-        text="#0B1220", text_soft="#33445B", muted="#6B7C92", label="#8595A8",
-        name_from="#0B1220", name_to="#26344A",
-        eyebrow="#C2643A", tagline="#5A6B80",
-        pill_bg="#FFFFFF", pill_border="#DCE4EF", pill_text="#33445B",
-        term_bg="#0C131D", term_border="#D8E0EA",
-        term_text="#D7E2EF", term_muted="#7C8CA1",
-        term_green="#6EE7B7", term_amber="#F0A87B",
-        bar="#A9BBD2", bar_accent="#D98250", stub="#E3EAF3",
-        hair="#E1E8F1",
-        shadow="#94A3B8", shadow_op="0.20",
+        bg0="#FFFFFF", bg1="#F4F4F4", border="#DCDCDC",
+        dot="#D4D4D4", dot_op="0.75",
+        amber="#000000", amber_op="0.06", blue="#525252", blue_op="0.05",
+        text="#0A0A0A", text_soft="#262626", muted="#666666", label="#808080",
+        name_from="#000000", name_to="#404040",
+        eyebrow="#171717", tagline="#525252",
+        pill_bg="#FFFFFF", pill_border="#DCDCDC", pill_text="#262626",
+        term_bg="#0A0A0A", term_border="#D4D4D4",
+        term_text="#F5F5F5", term_muted="#737373",
+        term_green="#D4D4D4", term_amber="#FFFFFF",
+        term_dot1="#FFFFFF", term_dot2="#999999", term_dot3="#525252",
+        bar="#BDBDBD", bar_accent="#111111", stub="#E5E5E5",
+        hair="#E0E0E0",
+        shadow="#000000", shadow_op="0.14",
         members=[
-            "#D98250",  # amber
-            "#3B76E1",  # blue
-            "#10B981",  # emerald
-            "#7C3AED",  # violet
-            "#DB2777",  # pink
-            "#0284C7",  # sky
-            "#D97706",  # ochre
-            "#E11D48",  # crimson
+            "#0A0A0A",  # obsidian black
+            "#4A4A4A",  # dark graphite
+            "#787878",  # mid gray
+            "#A6A6A6",  # light gray
+            "#262626",  # ink
+            "#616161",  # stone
+            "#8F8F8F",  # silver
+            "#BDBDBD",  # pale gray
         ],
     ),
 }

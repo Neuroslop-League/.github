@@ -327,6 +327,10 @@ def render(d: dict, name: str) -> str:
                 seg_h = total_h * cnt / total
                 seg_y = cursor - seg_h
                 color = palette[idx % len(palette)]
+                if segs and seg_h > 1.5:
+                    segs.append(
+                        f'        <path d="M{x:.1f} {cursor:.2f} h{bar_w:.1f}" stroke="{t["bg0"]}" stroke-width="1"/>'
+                    )
                 segs.append(
                     f'        <rect x="{x:.1f}" y="{seg_y:.2f}" width="{bar_w:.1f}" height="{seg_h + 0.4:.2f}" fill="{color}"/>'
                 )
