@@ -1,0 +1,49 @@
+name: league stats cards
+
+on:
+  schedule:
+    # Every 6 hours: 00:47, 06:47, 12:47 and 18:47 UTC. GitHub queues scheduled
+    # runs, so allow for a few minutes of delay at busy times.
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats
+  cancel-in-progress: true
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate cards
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/gen_banner.py
+          python3 scripts/gen_org_stats.py
+
+      # Commits at most once a run: the numbers move, or the "updated" date
+      # turns over. A run that finds both unchanged exits here and writes nothing.
+      - name: Commit if the numbers moved
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/banner-dark.svg assets/banner-light.svg \
+                                 assets/commits-dark.svg assets/commits-light.svg; then
+            echo "No change in the data, nothing to do."
+            exit 0
+          fi
+          git add assets/banner-dark.svg assets/banner-light.svg \
+                  assets/commits-dark.svg assets/commits-light.svg
+          git commit -m "Refresh league cards"
+          git pull --rebase origin main
+          git push
