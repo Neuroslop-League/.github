@@ -80,6 +80,7 @@ All official League projects are open source. Explore our repositories, contribu
 | Project | What it is | Stack | Stars |
 | :--- | :--- | :--- | ---: |
 | **[burdaAI](https://github.com/Neuroslop-League/burdaAI)** | *No description yet — probably vibe-coded at 3 AM.* | `Python` `Rust` `C++` | ★ 1 |
+| **[burdaAI-mainsite](https://github.com/Neuroslop-League/burdaAI-mainsite)** | *No description yet — probably vibe-coded at 3 AM.* | `Rust` `CSS` `HTML` | ★ 0 |
 <!-- PROJECTS:END -->
 
 ---
